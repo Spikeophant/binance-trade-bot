@@ -19,7 +19,7 @@ CFG_FL_NAME = 'user.cfg'
 USER_CFG_SECTION = 'binance_user_config'
 
 # Init config
-config = configparser.ConfigParser()
+config = configparser.ConfigParser({'tld':'com'})
 if not os.path.exists(CFG_FL_NAME):
     print('No configuration file (user.cfg) found! See README.')
     exit()
@@ -345,7 +345,7 @@ def update_trade_threshold(client):
     all_tickers = get_all_market_tickers(client)
 
     global g_state
-    
+
     current_coin_price = get_market_ticker_price_from_list(all_tickers, g_state.current_coin + BRIDGE)
 
     if current_coin_price is None:
@@ -354,7 +354,7 @@ def update_trade_threshold(client):
 
     for coin_dict in g_state.coin_table.copy():
         coin_dict_price = get_market_ticker_price_from_list(all_tickers, coin_dict + BRIDGE)
-        
+
         if coin_dict_price is None:
             logger.info("Skipping update for coin {0} not found".format(coin_dict + BRIDGE))
             continue
@@ -368,13 +368,13 @@ def initialize_trade_thresholds(client):
     '''
     Initialize the buying threshold of all the coins for trading between them
     '''
-    
+
     all_tickers = get_all_market_tickers(client)
-    
+
     global g_state
     for coin_dict in g_state.coin_table.copy():
         coin_dict_price = get_market_ticker_price_from_list(all_tickers, coin_dict + BRIDGE)
-        
+
         if coin_dict_price is None:
             logger.info("Skipping initializing {0}, symbol not found".format(coin_dict + BRIDGE))
             continue
@@ -403,9 +403,9 @@ def scout(client, transaction_fee=0.001, multiplier=5):
     all_tickers = get_all_market_tickers(client)
 
     global g_state
-    
+
     current_coin_price = get_market_ticker_price_from_list(all_tickers, g_state.current_coin + BRIDGE)
-    
+
     if current_coin_price is None:
         logger.info("Skipping scouting... current coin {0} not found".format(g_state.current_coin + BRIDGE))
         return
@@ -432,8 +432,9 @@ def scout(client, transaction_fee=0.001, multiplier=5):
 def main():
     api_key = config.get(USER_CFG_SECTION, 'api_key')
     api_secret_key = config.get(USER_CFG_SECTION, 'api_secret_key')
+    tld = config.get(USER_CFG_SECTION, 'tld')
 
-    client = Client(api_key, api_secret_key)
+    client = Client(api_key, api_secret_key, tld='tld')
 
     global g_state
     if not (os.path.isfile(g_state._table_backup_file)):
