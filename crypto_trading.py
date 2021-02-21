@@ -19,7 +19,7 @@ CFG_FL_NAME = 'user.cfg'
 USER_CFG_SECTION = 'binance_user_config'
 
 # Init config
-config = configparser.ConfigParser({'tld':'com'})
+config = configparser.ConfigParser()
 if not os.path.exists(CFG_FL_NAME):
     print('No configuration file (user.cfg) found! See README.')
     exit()
@@ -432,9 +432,10 @@ def scout(client, transaction_fee=0.001, multiplier=5):
 def main():
     api_key = config.get(USER_CFG_SECTION, 'api_key')
     api_secret_key = config.get(USER_CFG_SECTION, 'api_secret_key')
-    tld = config.get(USER_CFG_SECTION, 'tld')
 
-    client = Client(api_key, api_secret_key, tld='tld')
+    tld = config.get(USER_CFG_SECTION, 'tld') or 'com' # Default Top-level domain is 'com'
+
+    client = Client(api_key, api_secret_key, tld=tld)
 
     global g_state
     if not (os.path.isfile(g_state._table_backup_file)):
